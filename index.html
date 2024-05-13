@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+    <meta charset='UTF-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <title></title>
+    <link rel='stylesheet' href='assets/water.css'>
+    <style>
+        body{
+            background-color:#333;
+            color:white;
+        }
+    </style>
+</head>
+<body>
+
+    <main>
+        <h2>Search</h2>
+
+        <div >
+            <input type="text" class="search">
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                </tr>
+            </thead>
+            <tbody>
+
+            </tbody>
+        </table>
+
+    </main>
+
+    <script src='assets/jquery.js'></script>
+    <script>
+        $(document).ready(function () {
+            let limit = 1000
+
+            function fetchAllData(){
+                $.getJSON("data.json",                    
+                    function (data, textStatus, jqXHR) {
+
+                        $("tbody").html("");
+                        let i = 0
+                        for (const d of data) {  
+                            i++  
+                            if(i>limit){break}
+                            let content = `<tr><td>${d.id}</td><td>${d.name}</td><td>${d.email}</td></tr>`
+
+                            $("tbody").append(content);
+                            console.log(d.name,d.email);
+                        }
+                    }
+                );
+            }
+
+            
+            function fetchSearch(string){
+                // string = "jim"
+    
+                $.getJSON("data.json",
+                    
+                    function (data, textStatus, jqXHR) {
+    
+                        $("tbody").html("");
+                        let i = 0
+                        for (const d of data) {
+                            if(isAlike(d.name,d.email,string)){
+
+                                i++  
+                                if(i>limit){break}
+
+                                let content = `<tr><td>${d.id}</td><td>${d.name}</td><td>${d.email}</td></tr>`
+    
+                                $("tbody").append(content);
+                                // console.log(d.name,d.email);
+                            }
+                        }
+                    }
+                );
+            }
+
+
+            $(".search").keyup(function (e) { 
+                let SearchInput = $(this).val();
+                console.log(SearchInput);
+                if(SearchInput.length >= 1){
+                    fetchSearch(SearchInput)
+                }else{
+                    fetchAllData()
+                }
+            });
+            fetchAllData()
+        });
+
+        function isAlike(name,email,string){
+            name = name.toLowerCase()
+            email = email.toLowerCase()
+
+            let regex = new RegExp(string);
+            // console.log("name: ",regex.test(name),"email: ",regex.test(email));
+            return regex.test(name) || regex.test(email)
+        }
+    </script>
+</body>
+</html>
